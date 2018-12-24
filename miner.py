@@ -264,7 +264,5 @@ def threaded_function():
             hashes += 1
 
 if __name__ == "__main__":
-    thread = Thread(target = threaded_function, args = ())
-    thread.start()
-    thread.join()
+    threaded_function()
 
