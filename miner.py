@@ -86,7 +86,7 @@ def threaded_function():
 
 # The GAS mining template answer looks like this:
 # {'transaction': '030000000000000000000000000000000023324e3958747167416544486d4d345a71333259687a615574503761386e534455445a411055555555555555555555555555555555',
-#'target': 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
+#'target': 'efffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
 #'milestone': '48ebceecc51d85da77022de1b1c8a43e3ed73d87335918705f8d60023a897a2e'}
 #
 # Transaction is a hex encoded serialized version of this C structure:
@@ -114,8 +114,9 @@ def threaded_function():
 #    ... }
 #
 # The last 16 bytes, here prefilled with all 0x55, can be varied by the miner
-# The target value indicated that your hash, interpreted as a number, must be lesser than it. Note, it is provided in reverse form as well! The most significant bits are on the right!
-# e.g. after ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff would come ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000, which is slightly more difficult
+# The target value indicated that your hash, interpreted as a number, must be lesser than it. 
+# Note, that also the target comes in reversed form ...
+# so 0xFFFF.FFFFF0000 would be slighly more difficult than 0xFFFF.FFFFFFFFF
 # The milestone is is the hash of the hash of the last block rounded to 10's
 # So then a minegas transaction is meant to be added to block 318733, its milestone block would be 318730
 # !! If a tx is included in block 318730, then 318720 is the milestone
@@ -207,7 +208,12 @@ def threaded_function():
 #
 # 2018-12-24T12:14:49Z We saw a GAS-MINER transaction, credited 100000000000 + 0 (fees) satoshis in BTCGAS and sent to 2N9XtqgAeDHmM4Zq32YhzaUtP7a8nSDUDZA
 # 2018-12-24T12:14:49Z | preupdate wallet transaction; old debit: 0, new debit: 0, old credit: 0, new credit: 100000000000
-# 2018-12-24T12:14:49Z Hash was: c9cf4e1e3b48e633f6f6771e64b6e8dc1ab0ea08e0474945b4019780dc343865 [target ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff]
+# 2018-12-24T12:14:49Z Hash was: 653834dc809701b4454947e008eab01adce8b6641e77f6f633e6483b1e4ecfc9 [target ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff]
+#
+#
+# To understand the nature of the reversed target -> For a slightly higher difficulty block the result might have looked like this
+# 2018-12-24T22:57:03Z Hash was: d78fd0689a6851fc2a5d4bb2fc3130b72093cfcc63000f9b4333ba3b00540000 [target ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000]
+#
 #############################################################################################################
 
 
@@ -229,7 +235,7 @@ def threaded_function():
             hashround2.update(hashround1.digest())
 
             # Final hash, swap endianness
-            finalhash = hashround2.digest()[::-1]
+            finalhash = hashround2.digest()
 
             # get hex hash
             hdig = binascii.hexlify(finalhash)
