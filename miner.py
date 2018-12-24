@@ -228,7 +228,7 @@ while 1==1:
         hashresult = int(hdig, 16)
 
         # This routine is just for submitting the result
-        if hashresult < numericaltarget or 1==1:
+        if hashresult < numericaltarget:
 
             print("[" + str(datetime.datetime.now().time()) + "]","found a valid hash:",hdig.decode('ascii'))
             time.sleep(1)
