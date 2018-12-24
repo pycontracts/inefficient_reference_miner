@@ -94,11 +94,11 @@ while 1==1:
 # {
 # public:
 #    ...
-#    std::string data;
 #    uint8_t command;
 #    uint64_t value;
 #    uint64_t gaslimit;
 #    std::string receiver;
+#    std::string data;
 #    ... }
 #
 # The last 16 bytes, here prefilled with all 0x55, can be varied by the miner
