@@ -72,9 +72,8 @@ def threaded_function():
             time.sleep(5)
             continue;
 
-        print(template)
         binarypayload = binascii.unhexlify(template['transaction'])
-        numericaltarget = int(template['target'], 16)
+        numericaltarget = int(binascii.hexlify(binascii.unhexlify(template['target'])[::-1]), 16)
         milestoneblock = binascii.unhexlify(template["milestone"])[::-1]
 
 
@@ -115,7 +114,8 @@ def threaded_function():
 #    ... }
 #
 # The last 16 bytes, here prefilled with all 0x55, can be varied by the miner
-# The target value indicated that your hash, interpreted as a number, must be lesser than it
+# The target value indicated that your hash, interpreted as a number, must be lesser than it. Note, it is provided in reverse form as well! The most significant bits are on the right!
+# e.g. after ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff would come ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000, which is slightly more difficult
 # The milestone is is the hash of the hash of the last block rounded to 10's
 # So then a minegas transaction is meant to be added to block 318733, its milestone block would be 318730
 # !! If a tx is included in block 318730, then 318720 is the milestone
