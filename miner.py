@@ -177,6 +177,9 @@ while 1==1:
 # 10 <--- Part of "transaction" from the "template" / Length of "rest", i.e., the nonce payload. Here 0x10 = 16
 # 5795ef9cdec2ef93c34998d824d73b5f <---- OUR RANDOM 16 BYTES
 #
+# Technically, you can construct those bytes yourself and you do not need to call minegastemplate() via RPC at all.
+# Also, be advised that the hash will come out of SHA256 reversed. So see it like below, you need to reverse it.
+#
 # AND THIS IS THE HASH THAT SHOULD COME OUT FOR THE EXAMPLE ABOVE
 #
 # 2018-12-24T12:14:49Z We saw a GAS-MINER transaction, credited 100000000000 + 0 (fees) satoshis in BTCGAS and sent to 2N9XtqgAeDHmM4Zq32YhzaUtP7a8nSDUDZA
