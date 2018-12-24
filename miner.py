@@ -68,7 +68,7 @@ def threaded_function():
         try:
             template = get_template(rpc(), args.address[0])
         except:
-            print("[" + str(datetime.datetime.now().time()) + "]","error connecting to RPC, retryingin 5 seconds ...")
+            print("[" + str(datetime.datetime.now().time()) + "]","error connecting to RPC, retrying in 5 seconds ...")
             time.sleep(5)
             continue;
 
