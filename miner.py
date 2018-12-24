@@ -63,8 +63,11 @@ while 1==1:
     # First we must get the "GAS mining template".
     # It contains the BitcoinPy payload (basically the mine transaction in its raw form, pre-prepared with your address as the receipient) as well as the current difficulty
     template = get_template(rpc_connection, args.address[0])
+    print(template)
     binarypayload = binascii.unhexlify(template['transaction'])
     numericaltarget = int(template['target'], 16)
+    milestoneblock = binascii.unhexlify(template["milestone"])[::-1]
+
 
 #############################################################################################################
 # IMPORTANT INFORMATION
@@ -74,8 +77,9 @@ while 1==1:
 # minegastemplate 2N9XtqgAeDHmM4Zq32YhzaUtP7a8nSDUDZA
 
 # The GAS mining template answer looks like this:
-# {"transaction": "030000000000000000000000000000000023324e3958747167416544486d4d345a71333259687a615574503761386e534455445a411055555555555555555555555555555555",
-#  "target": "0000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"}
+# {'transaction': '030000000000000000000000000000000023324e3958747167416544486d4d345a71333259687a615574503761386e534455445a411055555555555555555555555555555555',
+#'target': 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
+#'milestone': '48ebceecc51d85da77022de1b1c8a43e3ed73d87335918705f8d60023a897a2e'}
 #
 # Transaction is a hex encoded serialized version of this C structure:
 #    SerializablePayload pl;
@@ -102,6 +106,11 @@ while 1==1:
 #    ... }
 #
 # The last 16 bytes, here prefilled with all 0x55, can be varied by the miner
+# The target value indicated that your hash, interpreted as a number, must be lesser than it
+# The milestone is is the hash of the hash of the last block rounded to 10's
+# So then a minegas transaction is meant to be added to block 318733, its milestone block would be 318730
+# !! If a tx is included in block 318730, then 318720 is the milestone
+#
 #############################################################################################################
 
 
@@ -154,6 +163,8 @@ while 1==1:
 # The hash algorithm is a simple double SHA256d.
 # Here is what needs to be hashed to obtain the correct HASH
 #
+# At first, we write the milestone block hash in binary (not hex) form; reversed [see example below]
+#
 # For each input (or rather its consumed COutPoint) (in this miner, we only have one) we have to write this into the hasher
 # - TXID, in binary (not hex) form, and reversed [see example below].
 # - VOUT, as big endian 32 bit integer
@@ -167,30 +178,34 @@ while 1==1:
 #
 # Here, a specific example of what bytes are hashed for one specific example
 #
-# 0799df867cb89d9b60be55419dcab1902383996b5ff0747f9c73517d1f4ccf31 <--- TXID (reversed), transaction was 0x31cf4c1f....
-# 00000000 <--- big endian VOUT = 0
+# 2e7a893a02608d5f70185933873dd73e3ea4c8b1e12d0277da851dc5ecceeb48 <--- TXID (reversed) of milestone, block hash was 0x48ebceec...
+# 07f2e97500af9b5c0532de416e73b08323f23db2dc5ff547e4937d0545ee44ac <--- TXID (reversed) of first COutPoint, transaction was 0xac44ee45....
+# 00000000 <--- big endian VOUT of first COutPoint = 0
 # 03 <--- Part of "transaction" from the "template" / means command type 0x03 = MINING
 # 0000000000000000 <---- Part of "transaction" from the "template" / value transmitted, 64bit, must be 0 for mining
 # 0000000000000000 <---- Part of "transaction" from the "template" / gaslimit to pay, 64bit, must be 0 for mining
 # 23 <---- Part of "transaction" from the "template" / length of string receipient address
 # 324e3958747167416544486d4d345a71333259687a615574503761386e534455445a41 <---- Part of "transaction" from the "template" / receipient address raw bytes
 # 10 <--- Part of "transaction" from the "template" / Length of "rest", i.e., the nonce payload. Here 0x10 = 16
-# 5795ef9cdec2ef93c34998d824d73b5f <---- OUR RANDOM 16 BYTES
+# 0fbb5bcc1d1aaab2ba481d57f1c56e72 <---- OUR RANDOM 16 BYTES
 #
 # Technically, you can construct those bytes yourself and you do not need to call minegastemplate() via RPC at all.
-# Also, be advised that the hash will come out of SHA256 reversed. So see it like below, you need to reverse it.
+# Also, be advised that the hash will come out of SHA256 reversed.
+# In this particular example, the bytestring would be [653834dc...]
+# So see it in the representation below, you need to reverse it once again.
 #
 # AND THIS IS THE HASH THAT SHOULD COME OUT FOR THE EXAMPLE ABOVE
 #
 # 2018-12-24T12:14:49Z We saw a GAS-MINER transaction, credited 100000000000 + 0 (fees) satoshis in BTCGAS and sent to 2N9XtqgAeDHmM4Zq32YhzaUtP7a8nSDUDZA
 # 2018-12-24T12:14:49Z | preupdate wallet transaction; old debit: 0, new debit: 0, old credit: 0, new credit: 100000000000
-# 2018-12-24T12:14:49Z Hash was: 0000ceaa447004633363266352782fa80326e67e127f7458a5dfa4d7654d7356 [target 0000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff]
+# 2018-12-24T12:14:49Z Hash was: c9cf4e1e3b48e633f6f6771e64b6e8dc1ab0ea08e0474945b4019780dc343865 [target ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff]
 #############################################################################################################
 
 
 
         # create hasher with midstate
         hashround1 = SHA256()
+        hashround1.update(milestoneblock)
         hashround1.update(voutpreface)
         hashround1.update(midstateinput)
         hashround1.update(secondpart[:-16])
@@ -213,7 +228,7 @@ while 1==1:
         hashresult = int(hdig, 16)
 
         # This routine is just for submitting the result
-        if hashresult < numericaltarget:
+        if hashresult < numericaltarget or 1==1:
 
             print("[" + str(datetime.datetime.now().time()) + "]","found a valid hash:",hdig.decode('ascii'))
             time.sleep(1)
