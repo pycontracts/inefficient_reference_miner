@@ -178,16 +178,16 @@ while 1==1:
 #
 # Here, a specific example of what bytes are hashed for one specific example
 #
-# 2e7a893a02608d5f70185933873dd73e3ea4c8b1e12d0277da851dc5ecceeb48 <--- TXID (reversed) of milestone, block hash was 0x48ebceec...
-# 07f2e97500af9b5c0532de416e73b08323f23db2dc5ff547e4937d0545ee44ac <--- TXID (reversed) of first COutPoint, transaction was 0xac44ee45....
-# 00000000 <--- big endian VOUT of first COutPoint = 0
-# 03 <--- Part of "transaction" from the "template" / means command type 0x03 = MINING
-# 0000000000000000 <---- Part of "transaction" from the "template" / value transmitted, 64bit, must be 0 for mining
-# 0000000000000000 <---- Part of "transaction" from the "template" / gaslimit to pay, 64bit, must be 0 for mining
-# 23 <---- Part of "transaction" from the "template" / length of string receipient address
-# 324e3958747167416544486d4d345a71333259687a615574503761386e534455445a41 <---- Part of "transaction" from the "template" / receipient address raw bytes
-# 10 <--- Part of "transaction" from the "template" / Length of "rest", i.e., the nonce payload. Here 0x10 = 16
-# 0fbb5bcc1d1aaab2ba481d57f1c56e72 <---- OUR RANDOM 16 BYTES
+# (32 byte) 2e7a893a02608d5f70185933873dd73e3ea4c8b1e12d0277da851dc5ecceeb48 <--- TXID (reversed) of milestone, block hash was 0x48ebceec...
+# (32 byte) 07f2e97500af9b5c0532de416e73b08323f23db2dc5ff547e4937d0545ee44ac <--- TXID (reversed) of first COutPoint, transaction was 0xac44ee45....
+# ( 4 byte) 00000000 <--- big endian VOUT of first COutPoint = 0
+# ( 1 byte) 03 <--- Part of "transaction" from the "template" / means command type 0x03 = MINING
+# ( 8 byte) 0000000000000000 <---- Part of "transaction" from the "template" / value transmitted, 64bit, must be 0 for mining
+# ( 8 byte) 0000000000000000 <---- Part of "transaction" from the "template" / gaslimit to pay, 64bit, must be 0 for mining
+# ( 1 byte) 23 <---- Part of "transaction" from the "template" / length of string receipient address
+# (23 byte) 324e3958747167416544486d4d345a71333259687a615574503761386e534455445a41 <---- Part of "transaction" from the "template" / receipient address raw bytes
+# (01 byte) 10 <--- Part of "transaction" from the "template" / Length of "rest", i.e., the nonce payload. Here 0x10 = 16
+# (16 byte) 0fbb5bcc1d1aaab2ba481d57f1c56e72 <---- OUR RANDOM 16 BYTES
 #
 # Technically, you can construct those bytes yourself and you do not need to call minegastemplate() via RPC at all.
 # Also, be advised that the hash will come out of SHA256 reversed.
