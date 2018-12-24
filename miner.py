@@ -52,19 +52,26 @@ parser.add_argument('--address', '-a', type=str, nargs=1,
                     help='the address to receive the GAS mining rewards')
 args = parser.parse_args()
 
-# Let us create a connection first
-rpc_connection = AuthServiceProxy("http://%s:%s@%s"%(args.rpc_user[0], args.rpc_password[0], args.rpc_endpoint[0]))
+# Let us create a connection on demand
+def rpc():
+    return AuthServiceProxy("http://%s:%s@%s"%(args.rpc_user[0], args.rpc_password[0], args.rpc_endpoint[0]))
 
 # Here, we configure how much time needs to pass before refetching the template / target and looking for new unspent outputs
 MAX_INNER_LOOP_TIME = 5*60 # 5 minutes
 HEART_BEAT_TIME = 10 # print hashrate every 10 seconds
 
-def threaded_function(rpc_connection):
+def threaded_function():
     while 1==1:
 
         # First we must get the "GAS mining template".
         # It contains the BitcoinPy payload (basically the mine transaction in its raw form, pre-prepared with your address as the receipient) as well as the current difficulty
-        template = get_template(rpc_connection, args.address[0])
+        try:
+            template = get_template(rpc(), args.address[0])
+        except:
+            print("[" + str(datetime.datetime.now().time()) + "]","error connecting to RPC, retryingin 5 seconds ...")
+            time.sleep(5)
+            continue;
+
         print(template)
         binarypayload = binascii.unhexlify(template['transaction'])
         numericaltarget = int(template['target'], 16)
@@ -119,7 +126,7 @@ def threaded_function(rpc_connection):
         # since the GAS mining hash depends on all "input prevout's" of the transaction, we have to decide which inputs we want to pull in early on
         # Note: It does not depend on the inputs, but the input's prevouts! Making the signature of those inputs entirely irrelevant!
 
-        unspents = rpc_connection.listunspent(1) # all with min. 1 confirmation
+        unspents = rpc().listunspent(1) # all with min. 1 confirmation
         used_vout = None
         for x in unspents:
             if x["amount"] > 0.01:
@@ -237,10 +244,10 @@ def threaded_function(rpc_connection):
                 submit_data = midstateinput + secondpart[:-16] + binvar
 
                 try:
-                    p = rpc_connection.sendrawcontractpacket([{"txid": used_vout["txid"], "vout" : used_vout["vout"]}], binascii.hexlify(submit_data).decode('ascii'), 0.001)
-                    p = rpc_connection.signrawtransactionwithwallet(p)
+                    p = rpc().sendrawcontractpacket([{"txid": used_vout["txid"], "vout" : used_vout["vout"]}], binascii.hexlify(submit_data).decode('ascii'), 0.001)
+                    p = rpc().signrawtransactionwithwallet(p)
                     if "hex" in p:
-                        p = rpc_connection.sendrawtransaction(p["hex"])
+                        p = rpc().sendrawtransaction(p["hex"])
                     else:
                         raise Exception("Could not sign with wallet")
                     print("[" + str(datetime.datetime.now().time()) + "]","submitted gas mining TX:",p)
@@ -252,7 +259,7 @@ def threaded_function(rpc_connection):
             hashes += 1
 
 if __name__ == "__main__":
-    thread = Thread(target = threaded_function, args = (rpc_connection, ))
+    thread = Thread(target = threaded_function, args = ())
     thread.start()
     thread.join()
 
