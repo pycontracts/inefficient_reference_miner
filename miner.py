@@ -154,8 +154,8 @@ while 1==1:
 # The hash algorithm is a simple double SHA256d.
 # Here is what needs to be hashed to obtain the correct HASH
 #
-# For each input, or its COutPoint) (in this miner, we only have one) we have to write this into the hasher
-# - TXID, in binary (not hex) form, and reversed.
+# For each input (or rather its consumed COutPoint) (in this miner, we only have one) we have to write this into the hasher
+# - TXID, in binary (not hex) form, and reversed [see example below].
 # - VOUT, as big endian 32 bit integer
 #
 # Then, at the end, we hash in the entire "transaction" from above with the last 16 byte changed to whatever you want
