@@ -202,7 +202,6 @@ def threaded_function():
 # Technically, you can construct those bytes yourself and you do not need to call minegastemplate() via RPC at all.
 # Also, be advised that the hash will come out of SHA256 reversed.
 # In this particular example, the bytestring would be [653834dc...]
-# So see it in the representation below, you need to reverse it once again.
 #
 # AND THIS IS THE HASH THAT SHOULD COME OUT FOR THE EXAMPLE ABOVE
 #
