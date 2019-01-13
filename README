@@ -1,0 +1,4 @@
+You need the development libraries for:
+python3.6
+libexpat
+libz
