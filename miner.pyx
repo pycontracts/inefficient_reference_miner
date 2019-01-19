@@ -244,7 +244,7 @@ def threaded_function():
             # This routine is just for submitting the result
             if hashresult < numericaltarget:
 
-                print("[" + str(datetime.datetime.now().time()) + "]","found a valid hash:",hdig.decode('ascii'))
+                print("[" + str(datetime.datetime.now().time()) + "]","found a valid hash:",hdig.decode('ascii'),'<',numericaltarget)
                 time.sleep(1)
                 submit_data = midstateinput + secondpart[:-16] + binvar
 
