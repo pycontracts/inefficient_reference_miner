@@ -73,7 +73,7 @@ def threaded_function():
             continue;
 
         binarypayload = binascii.unhexlify(template['transaction'])
-        numericaltarget = int(binascii.hexlify(binascii.unhexlify(template['target'])), 16)
+        numericaltarget = int(template['target'], 16)
         milestoneblock = binascii.unhexlify(template["milestone"])[::-1]
 
 
