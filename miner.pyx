@@ -73,7 +73,7 @@ def threaded_function():
             continue;
 
         binarypayload = binascii.unhexlify(template['transaction'])
-        numericaltarget = int(binascii.hexlify(binascii.unhexlify(template['target'])[::-1]), 16)
+        numericaltarget = int(binascii.hexlify(binascii.unhexlify(template['target'])), 16)
         milestoneblock = binascii.unhexlify(template["milestone"])[::-1]
 
 
@@ -237,7 +237,7 @@ def threaded_function():
             finalhash = hashround2.digest()
 
             # get hex hash
-            hdig = binascii.hexlify(finalhash)
+            hdig = binascii.hexlify(finalhash[::-1])
 
             hashresult = int(hdig, 16)
 
