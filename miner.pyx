@@ -237,7 +237,7 @@ def threaded_function():
             finalhash = hashround2.digest()
 
             # get hex hash
-            hdig = binascii.hexlify(finalhash[::-1])
+            hdig = binascii.hexlify(finalhash)
 
             hashresult = int(hdig, 16)
 
